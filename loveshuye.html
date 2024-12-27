@@ -82,7 +82,7 @@
                 // 爱心可见  
                 const heartShape = createHeartShape();  
                 heartShape.forEach(point => {  
-                    for (let i = 0; i < 555; i++) { // 每个心形点生成5个粒子  
+                    for (let i = 0; i < 5; i++) { // 每个心形点生成5个粒子  
                         const color = (Math.random() < 0.5) ? 'rgba(255, 0, 0, 0.8)' : 'rgba(0, 0, 255, 0.8)'; // 随机选择红色或蓝色  
                         particles.push(new Particle(point.x, point.y, color));  
                     }  
