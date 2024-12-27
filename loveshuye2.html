@@ -1,0 +1,146 @@
+<!DOCTYPE html>  
+<html lang="en">  
+<head>  
+    <meta charset="UTF-8">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+    <title>动态爱心特效</title>  
+    <style>  
+        body {  
+            margin: 0;  
+            overflow: hidden;  
+            background-color: black;  
+            color: white; /* 设置文字颜色为白色 */  
+            font-family: Arial, sans-serif; /* 设置字体 */  
+            text-align: center; /* 文字居中 */  
+            position: relative; /* 使文字相对定位 */  
+        }  
+        canvas {  
+            display: block;  
+            position: absolute; /* 使canvas绝对定位 */  
+            top: 0;  
+            left: 0;  
+        }  
+        .text {  
+            position: absolute;  
+            top: 70%; /* 调整文字位置 */  
+            left: 50%;  
+            transform: translate(-50%, -50%); /* 使文字居中 */  
+            font-size: 30px; /* 设置字体大小 */  
+            z-index: 1; /* 确保文字在canvas之上 */  
+        }  
+    </style>  
+</head>  
+<body>  
+    <canvas id="canvas"></canvas>  
+    <div class="text">爱你哟树叶宝宝</div>  
+    <script>  
+        const canvas = document.getElementById('canvas');  
+        const ctx = canvas.getContext('2d');  
+        canvas.width = window.innerWidth;  
+        canvas.height = window.innerHeight;  
+
+        let particles = [];  
+        let animationState = 'forming'; // 动画状态  
+        let startTime = null;  
+
+        class Particle {  
+            constructor(x, y, color) {  
+                this.x = x;  
+                this.y = y;  
+                this.size = Math.random() * 2 + 1; // 粒子更小  
+                this.speedX = (Math.random() - 0.5) * 2; // 随机水平速度  
+                this.speedY = Math.random() * -2 - 1; // 向上运动  
+                this.color = color;  
+                this.lifetime = Math.random() * 100 + 50; // 设置粒子的生命周期  
+                this.opacity = Math.random(); // 随机透明度  
+            }  
+
+            update() {  
+                this.x += this.speedX;  
+                this.y += this.speedY;  
+                this.size *= 0.95; // 粒子逐渐变小  
+                this.lifetime--; // 减少生命周期  
+                this.opacity = Math.max(0, this.opacity - 0.02); // 渐变消失  
+            }  
+
+            draw() {  
+                ctx.fillStyle = this.color.replace('0.8', this.opacity); // 根据透明度设置颜色  
+                ctx.beginPath();  
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);  
+                ctx.fill();  
+            }  
+        }  
+
+        function createHeartShape() {  
+            const heartShape = [];  
+            for (let t = 0; t < Math.PI * 2; t += 0.1) {  
+                const x = 16 * Math.sin(t) ** 3;  
+                const y = 13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t);  
+                heartShape.push({ x: x * 10 + canvas.width / 2, y: -y * 10 + canvas.height / 2 });  
+            }  
+            return heartShape;  
+        }  
+
+        function animate(timestamp) {  
+            if (!startTime) startTime = timestamp;  
+            const elapsed = timestamp - startTime;  
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);  
+
+            if (animationState === 'forming' && elapsed < 2000) {  
+                // 形成爱心  
+                const heartShape = createHeartShape();  
+                heartShape.forEach(point => {  
+                    for (let i = 0; i < 20; i++) { // 每个心形点生成20个粒子  
+                        const color = (Math.random() < 0.5) ? 'rgba(255, 0, 0, 0.8)' : 'rgba(255, 192, 203, 0.8)'; // 随机选择红色或粉色  
+                        particles.push(new Particle(point.x, point.y, color));  
+                    }  
+                });  
+            } else if (animationState === 'visible' && elapsed < 5000) {  
+                // 爱心可见  
+                const heartShape = createHeartShape();  
+                heartShape.forEach(point => {  
+                    for (let i = 0; i < 10; i++) { // 每个心形点生成10个粒子  
+                        const color = (Math.random() < 0.5) ? 'rgba(255, 0, 0, 0.8)' : 'rgba(255, 192, 203, 0.8)'; // 随机选择红色或粉色  
+                        particles.push(new Particle(point.x, point.y, color));  
+                    }  
+                });  
+            } else if (elapsed >= 5000) {  
+                // 重置动画  
+                startTime = null;  
+                particles = [];  
+                animationState = 'forming';  
+                return; // 结束当前帧  
+            }  
+
+            particles.forEach((particle, index) => {  
+                particle.update();  
+                particle.draw();  
+                if (particle.lifetime <= 0 || particle.size <= 0.2) {  
+                    particles.splice(index, 1);  
+                }  
+            });  
+
+            requestAnimationFrame(animate);  
+        }  
+
+        window.addEventListener('resize', () => {  
+            canvas.width = window.innerWidth;  
+            canvas.height = window.innerHeight;  
+        });  
+
+        // 启动动画  
+        animate();  
+
+        // 每隔一段时间切换状态  
+        setInterval(() => {  
+            if (animationState === 'forming') {  
+                animationState = 'visible'; // 切换到可见状态  
+            } else {  
+                animationState = 'forming'; // 切换到形成状态  
+            }  
+        }, 7000); // 每7秒切换状态  
+
+    </script>  
+</body>  
+</html>
