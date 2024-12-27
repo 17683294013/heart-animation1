@@ -1,0 +1,105 @@
+<!DOCTYPE html>  
+<html lang="en">  
+<head>  
+    <meta charset="UTF-8">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+    <title>满屏爱心特效</title>  
+    <style>  
+        body {  
+            margin: 0;  
+            overflow: hidden;  
+            background-color: black;  
+        }  
+        canvas {  
+            display: block;  
+        }  
+    </style>  
+</head>  
+<body>  
+    <canvas id="canvas"></canvas>  
+    <script>  
+        const canvas = document.getElementById('canvas');  
+        const ctx = canvas.getContext('2d');  
+        canvas.width = window.innerWidth;  
+        canvas.height = window.innerHeight;  
+
+        let particles = [];  
+
+        class Particle {  
+            constructor(x, y, color) {  
+                this.x = x;  
+                this.y = y;  
+                this.size = Math.random() * 5 + 1;  
+                this.speedX = (Math.random() - 0.5) * 4; // 随机水平速度  
+                this.speedY = Math.random() * -3 - 1; // 向上运动  
+                this.color = color;  
+                this.lifetime = Math.random() * 100 +110; // 设置粒子的生命周期  
+            }  
+
+            update() {  
+                this.x += this.speedX;  
+                this.y += this.speedY;  
+                this.size *= 0.95; // 粒子逐渐变小  
+                this.lifetime--; // 减少生命周期  
+            }  
+
+            draw() {  
+                ctx.fillStyle = this.color;  
+                ctx.beginPath();  
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);  
+                ctx.fill();  
+            }  
+        }  
+
+        function createHeartShape() {  
+            const heartShape = [];  
+            for (let t = 0; t < Math.PI * 2; t += 0.1) {  
+                const x = 16 * Math.sin(t) ** 3;  
+                const y = 13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t);  
+                heartShape.push({ x: x * 10 + canvas.width / 2, y: -y * 10 + canvas.height / 2 });  
+            }  
+            return heartShape;  
+        }  
+
+        function animate() {  
+            ctx.clearRect(0, 0, canvas.width, canvas.height);  
+            particles.forEach((particle, index) => {  
+                particle.update();  
+                particle.draw();  
+                if (particle.lifetime <= 0 || particle.size <= 0.2) {  
+                    particles.splice(index, 1);  
+                }  
+            });  
+            requestAnimationFrame(animate);  
+        }  
+
+        function init() {  
+            const heartShape = createHeartShape();  
+            heartShape.forEach(point => {  
+                // 增加粒子数量  
+                for (let i = 0; i <150; i++) { // 每个心形点生成50个粒子  
+                    particles.push(new Particle(point.x, point.y, 'rgba(255, 0, 0, 0.8)'));  
+                }  
+            });  
+            animate();  
+        }  
+
+        window.addEventListener('resize', () => {  
+            canvas.width = window.innerWidth;  
+            canvas.height = window.innerHeight;  
+        });  
+
+        // 每隔一段时间重新生成爱心  
+        setInterval(() => {  
+            const heartShape = createHeartShape();  
+            heartShape.forEach(point => {  
+                for (let i = 0; i <150; i++) { // 每个心形点生成50个粒子  
+                    particles.push(new Particle(point.x, point.y, 'rgba(255, 0, 0, 0.8)'));  
+                }  
+            });  
+        },1500); // 每500毫秒生成一次爱心  
+
+        init();  
+    </script>  
+</body>  
+</html>
