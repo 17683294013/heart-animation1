@@ -9,14 +9,30 @@
             margin: 0;  
             overflow: hidden;  
             background-color: black;  
+            color: white; /* 设置文字颜色为白色 */  
+            font-family: Arial, sans-serif; /* 设置字体 */  
+            text-align: center; /* 文字居中 */  
+            position: relative; /* 使文字相对定位 */  
         }  
         canvas {  
             display: block;  
+            position: absolute; /* 使canvas绝对定位 */  
+            top: 0;  
+            left: 0;  
+        }  
+        .text {  
+            position: absolute;  
+            top: 70%; /* 调整文字位置 */  
+            left: 50%;  
+            transform: translate(-50%, -50%); /* 使文字居中 */  
+            font-size: 30px; /* 设置字体大小 */  
+            z-index: 1; /* 确保文字在canvas之上 */  
         }  
     </style>  
 </head>  
 <body>  
     <canvas id="canvas"></canvas>  
+    <div class="text">爱你哟树叶宝宝</div>  
     <script>  
         const canvas = document.getElementById('canvas');  
         const ctx = canvas.getContext('2d');  
