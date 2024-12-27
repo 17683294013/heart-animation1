@@ -3,7 +3,7 @@
 <head>  
     <meta charset="UTF-8">  
     <meta name="viewport" content="width=device-width, initial-scale=1.0">  
-    <title>满屏爱心特效</title>  
+    <title>动态爱心特效</title>  
     <style>  
         body {  
             margin: 0;  
@@ -24,6 +24,8 @@
         canvas.height = window.innerHeight;  
 
         let particles = [];  
+        let animationState = 'forming'; // 动画状态  
+        let startTime = null;  
 
         class Particle {  
             constructor(x, y, color) {  
@@ -33,7 +35,7 @@
                 this.speedX = (Math.random() - 0.5) * 4; // 随机水平速度  
                 this.speedY = Math.random() * -3 - 1; // 向上运动  
                 this.color = color;  
-                this.lifetime = Math.random() * 100 +1110; // 设置粒子的生命周期  
+                this.lifetime = Math.random() * 100 + 50; // 设置粒子的生命周期  
             }  
 
             update() {  
@@ -61,8 +63,36 @@
             return heartShape;  
         }  
 
-        function animate() {  
+        function animate(timestamp) {  
+            if (!startTime) startTime = timestamp;  
+            const elapsed = timestamp - startTime;  
+
             ctx.clearRect(0, 0, canvas.width, canvas.height);  
+
+            if (animationState === 'forming' && elapsed < 2000) {  
+                // 形成爱心  
+                const heartShape = createHeartShape();  
+                heartShape.forEach(point => {  
+                    for (let i = 0; i < 10; i++) { // 每个心形点生成10个粒子  
+                        particles.push(new Particle(point.x, point.y, 'rgba(255, 0, 0, 0.8)'));  
+                    }  
+                });  
+            } else if (animationState === 'visible' && elapsed < 5000) {  
+                // 爱心可见  
+                const heartShape = createHeartShape();  
+                heartShape.forEach(point => {  
+                    for (let i = 0; i < 5; i++) { // 每个心形点生成5个粒子  
+                        particles.push(new Particle(point.x, point.y, 'rgba(255, 0, 0, 0.8)'));  
+                    }  
+                });  
+            } else if (elapsed >= 5000) {  
+                // 重置动画  
+                startTime = null;  
+                particles = [];  
+                animationState = 'forming';  
+                return; // 结束当前帧  
+            }  
+
             particles.forEach((particle, index) => {  
                 particle.update();  
                 particle.draw();  
@@ -70,18 +100,8 @@
                     particles.splice(index, 1);  
                 }  
             });  
-            requestAnimationFrame(animate);  
-        }  
 
-        function init() {  
-            const heartShape = createHeartShape();  
-            heartShape.forEach(point => {  
-                // 增加粒子数量  
-                for (let i = 0; i <1150; i++) { // 每个心形点生成50个粒子  
-                    particles.push(new Particle(point.x, point.y, 'rgba(255, 0, 0, 0.8)'));  
-                }  
-            });  
-            animate();  
+            requestAnimationFrame(animate);  
         }  
 
         window.addEventListener('resize', () => {  
@@ -89,17 +109,18 @@
             canvas.height = window.innerHeight;  
         });  
 
-        // 每隔一段时间重新生成爱心  
-        setInterval(() => {  
-            const heartShape = createHeartShape();  
-            heartShape.forEach(point => {  
-                for (let i = 0; i <1150; i++) { // 每个心形点生成50个粒子  
-                    particles.push(new Particle(point.x, point.y, 'rgba(255, 0, 0, 0.8)'));  
-                }  
-            });  
-        },3500); // 每500毫秒生成一次爱心  
+        // 启动动画  
+        animate();  
 
-        init();  
+        // 每隔一段时间切换状态  
+        setInterval(() => {  
+            if (animationState === 'forming') {  
+                animationState = 'visible'; // 切换到可见状态  
+            } else {  
+                animationState = 'forming'; // 切换到形成状态  
+            }  
+        }, 5000); // 每7秒切换状态  
+
     </script>  
 </body>  
 </html>
