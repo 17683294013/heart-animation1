@@ -33,7 +33,7 @@
                 this.speedX = (Math.random() - 0.5) * 4; // 随机水平速度  
                 this.speedY = Math.random() * -3 - 1; // 向上运动  
                 this.color = color;  
-                this.lifetime = Math.random() * 100 +110; // 设置粒子的生命周期  
+                this.lifetime = Math.random() * 100 +1110; // 设置粒子的生命周期  
             }  
 
             update() {  
@@ -77,7 +77,7 @@
             const heartShape = createHeartShape();  
             heartShape.forEach(point => {  
                 // 增加粒子数量  
-                for (let i = 0; i <150; i++) { // 每个心形点生成50个粒子  
+                for (let i = 0; i <1150; i++) { // 每个心形点生成50个粒子  
                     particles.push(new Particle(point.x, point.y, 'rgba(255, 0, 0, 0.8)'));  
                 }  
             });  
@@ -93,11 +93,11 @@
         setInterval(() => {  
             const heartShape = createHeartShape();  
             heartShape.forEach(point => {  
-                for (let i = 0; i <150; i++) { // 每个心形点生成50个粒子  
+                for (let i = 0; i <1150; i++) { // 每个心形点生成50个粒子  
                     particles.push(new Particle(point.x, point.y, 'rgba(255, 0, 0, 0.8)'));  
                 }  
             });  
-        },1500); // 每500毫秒生成一次爱心  
+        },3500); // 每500毫秒生成一次爱心  
 
         init();  
     </script>  
