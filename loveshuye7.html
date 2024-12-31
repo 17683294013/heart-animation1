@@ -31,13 +31,13 @@
         }
 
         .text .line1 {
-            font-size: 2rem;
+            font-size: 2.5rem;
             color: pink;
             font-weight: bold;
         }
 
         .text .line2 {
-            font-size: 1.5rem;
+            font-size: 2rem;
             color: pink;
             margin-top: 10px;
         }
@@ -68,15 +68,15 @@
                 this.y = y;
                 this.color = color;
                 this.size = size;
-                this.life = 100;
-                this.dx = random(-2, 2);
-                this.dy = random(-2, 2);
+                this.life = 200; // 粒子寿命延长
+                this.dx = random(-1.5, 1.5);
+                this.dy = random(-1.5, 1.5);
             }
 
             update() {
                 this.x += this.dx;
                 this.y += this.dy;
-                this.size *= 0.96;
+                this.size *= 0.98;
                 this.life--;
             }
 
@@ -94,8 +94,8 @@
                 this.y = y;
                 this.color = color;
                 this.particles = [];
-                for (let i = 0; i < 20; i++) {
-                    this.particles.push(new Particle(this.x, this.y, this.color, random(2, 5)));
+                for (let i = 0; i < 30; i++) { // 增加烟花粒子数量
+                    this.particles.push(new Particle(this.x, this.y, this.color, random(3, 6)));
                 }
             }
 
@@ -120,6 +120,7 @@
         }
 
         function createFireworks() {
+            // 左右两侧蓝色烟花
             const firework1 = new Firework(canvas.width / 2 - 200, canvas.height / 2 - 200, 'blue');
             const firework2 = new Firework(canvas.width / 2 + 200, canvas.height / 2 - 200, 'blue');
             fireworks.push(firework1, firework2);
@@ -127,6 +128,8 @@
 
         function update() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // 更新爱心粒子
             particles.forEach((p, index) => {
                 p.update();
                 p.draw();
@@ -135,6 +138,7 @@
                 }
             });
 
+            // 更新烟花特效
             fireworks.forEach((f, index) => {
                 f.update();
                 f.draw();
@@ -143,6 +147,7 @@
                 }
             });
 
+            // 确保烟花不断生成
             if (fireworks.length === 0) {
                 createFireworks();
             }
@@ -150,14 +155,16 @@
             requestAnimationFrame(update);
         }
 
+        // 初始化特效
         drawHeart();
         createFireworks();
         update();
 
+        // 每10秒重新生成一次爱心和烟花特效
         setInterval(() => {
             drawHeart();
             createFireworks();
-        }, 5000);
+        }, 10000);
     </script>
 </body>
 </html>
