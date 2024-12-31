@@ -1,0 +1,220 @@
+<!DOCTYPE html>  
+<html lang="en">  
+<head>  
+    <meta charset="UTF-8">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+    <title>动态爱心特效</title>  
+    <style>  
+        body {  
+            margin: 0;  
+            overflow: hidden;  
+            background-color: black;  
+            color: white;  
+            font-family: Arial, sans-serif;  
+            text-align: center;  
+            position: relative;  
+        }  
+        canvas {  
+            display: block;  
+            position: absolute;  
+            top: 0;  
+            left: 0;  
+        }  
+        .text {  
+            position: absolute;  
+            top: 80%; /* 在爱心下面 */  
+            left: 50%;  
+            transform: translate(-50%, -50%);  
+            font-size: 30px;  
+            z-index: 1;  
+        }  
+        .newYearText {  
+            position: absolute;  
+            top: 85%; /* 第二行文字在爱心下面 */  
+            left: 50%;  
+            transform: translate(-50%, -50%);  
+            font-size: 30px;  
+            z-index: 1;  
+        }  
+    </style>  
+</head>  
+<body>  
+    <canvas id="canvas"></canvas>  
+    <div class="text">爱你哟树叶宝宝</div>  
+    <div class="newYearText">2025新年快乐</div>  
+    <script>  
+        const canvas = document.getElementById('canvas');  
+        const ctx = canvas.getContext('2d');  
+        canvas.width = window.innerWidth;  
+        canvas.height = window.innerHeight;  
+
+        let particles = [];  
+        let fireworks = [];  
+        let animationState = 'forming';   
+        let startTime = null;  
+        const fireworkColor = 'rgba(0, 0, 255, 1)'; // 蓝色烟花  
+
+        class Particle {  
+            constructor(x, y, color) {  
+                this.x = x;  
+                this.y = y;  
+                this.size = Math.random() * 2 + 1;   
+                this.speedX = (Math.random() - 0.5) * 2;   
+                this.speedY = Math.random() * -2 - 1;   
+                this.color = color;  
+                this.lifetime = Math.random() * 100 + 50;   
+                this.opacity = Math.random();   
+            }  
+
+            update() {  
+                this.x += this.speedX;  
+                this.y += this.speedY;  
+                this.size *= 0.95;   
+                this.lifetime--;   
+                this.opacity = Math.max(0, this.opacity - 0.02);  
+            }  
+
+            draw() {  
+                ctx.fillStyle = this.color.replace('0.8', this.opacity);   
+                ctx.beginPath();  
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);  
+                ctx.fill();  
+            }  
+        }  
+
+        class Firework {  
+            constructor(x, y) {  
+                this.x = x;  
+                this.y = y;  
+                this.particles = [];  
+                this.exploded = false;  
+                this.initialize();  
+            }  
+
+            initialize() {  
+                for (let i = 0; i < 50; i++) {  
+                    const angle = Math.random() * Math.PI * 2;  
+                    const speed = Math.random() * 4 + 2;  
+                    const color = fireworkColor;  
+                    this.particles.push({  
+                        x: this.x,  
+                        y: this.y,  
+                        size: Math.random() * 3 + 1,  
+                        speedX: Math.cos(angle) * speed,  
+                        speedY: Math.sin(angle) * speed,  
+                        color: color,  
+                        lifetime: Math.random() * 100 + 50,  
+                    });  
+                }  
+                this.exploded = true;  
+            }  
+
+            update() {  
+                if (this.exploded) {  
+                    for (let particle of this.particles) {  
+                        particle.x += particle.speedX;  
+                        particle.y += particle.speedY;  
+                        particle.lifetime--;  
+                    }  
+                }  
+            }  
+
+            draw() {  
+                if (this.exploded) {  
+                    for (let particle of this.particles) {  
+                        ctx.fillStyle = particle.color;  
+                        ctx.beginPath();  
+                        ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);  
+                        ctx.fill();  
+                    }  
+                }  
+            }  
+        }  
+
+        function createHeartShape() {  
+            const heartShape = [];  
+            for (let t = 0; t < Math.PI * 2; t += 0.1) {  
+                const x = 16 * Math.sin(t) ** 3;  
+                const y = 13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t);  
+                heartShape.push({ x: x * 10 + canvas.width / 2, y: -y * 10 + canvas.height / 2 });  
+            }  
+            return heartShape;  
+        }  
+
+        function animate(timestamp) {  
+            if (!startTime) startTime = timestamp;  
+            const elapsed = timestamp - startTime;  
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);  
+
+            if (animationState === 'forming' && elapsed < 2000) {  
+                const heartShape = createHeartShape();  
+                heartShape.forEach(point => {  
+                    for (let i = 0; i < 20; i++) {  
+                        const color = (Math.random() < 0.5) ? 'rgba(255, 0, 0, 0.8)' : 'rgba(255, 192, 203, 0.8)';  
+                        particles.push(new Particle(point.x, point.y, color));  
+                    }  
+                });  
+            } else if (animationState === 'visible' && elapsed < 5000) {  
+                const heartShape = createHeartShape();  
+                heartShape.forEach(point => {  
+                    for (let i = 0; i < 10; i++) {  
+                        const color = (Math.random() < 0.5) ? 'rgba(255, 0, 0, 0.8)' : 'rgba(255, 192, 203, 0.8)';  
+                        particles.push(new Particle(point.x, point.y, color));  
+                    }  
+                });  
+            } else if (elapsed >= 5000) {  
+                startTime = null;  
+                particles = [];  
+                animationState = 'forming';  
+                return;  
+            }  
+
+            particles.forEach((particle, index) => {  
+                particle.update();  
+                particle.draw();  
+                if (particle.lifetime <= 0 || particle.size <= 0.2) {  
+                    particles.splice(index, 1);  
+                }  
+            });  
+
+            fireworks.forEach((firework, index) => {  
+                firework.update();  
+                firework.draw();  
+                if (firework.particles[0].lifetime <= 0) {  
+                    fireworks.splice(index, 1);  
+                }  
+            });  
+
+            requestAnimationFrame(animate);  
+        }  
+
+        function launchFirework() {  
+            const xPositionLeft = 100; // 左侧烟花位置  
+            const xPositionRight = canvas.width - 100; // 右侧烟花位置  
+            const yPosition = canvas.height * 0.4; // 发射位置  
+            if (Math.random() < 0.5) {  
+                fireworks.push(new Firework(xPositionLeft, yPosition)); // 左侧烟花  
+            } else {  
+                fireworks.push(new Firework(xPositionRight, yPosition)); // 右侧烟花  
+            }  
+        }  
+
+        window.addEventListener('resize', () => {  
+            canvas.width = window.innerWidth;  
+            canvas.height = window.innerHeight;  
+        });  
+
+        animate();  
+
+        setInterval(() => {  
+            if (animationState === 'forming') {  
+                animationState = 'visible';  
+            } else {  
+                animationState = 'forming';  
+                launchFirework(); // 启动烟花  
+            }  
+        }, 7000);  
+    </script>  
+</body>  
+</html>
