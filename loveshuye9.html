@@ -89,21 +89,21 @@
         }
 
         class Firework {
-            constructor(x, y, color, scale = 1) {
+            constructor(x, y, color) {
                 this.x = x;
                 this.y = y;
                 this.color = color;
                 this.particles = [];
-                const count = 80 * scale; // 粒子数量根据 scale 动态调整
+                const count = 80; // 粒子数量固定
                 for (let i = 0; i < count; i++) {
                     const angle = (Math.PI * 2 * i) / count;
-                    const speed = random(2, 4) * scale; // 控制速度和范围
+                    const speed = random(2, 4); // 控制速度和范围
                     this.particles.push(
                         new Particle(
                             this.x,
                             this.y,
                             this.color,
-                            random(3, 6) * scale,
+                            random(2, 4), // 粒子大小调整为与爱心相同
                             Math.cos(angle) * speed,
                             Math.sin(angle) * speed
                         )
@@ -144,9 +144,9 @@
             const centerX = canvas.width / 2;
             const centerY = canvas.height / 2 - 150;
 
-            // 生成两组烟花
-            fireworks.push(new Firework(centerX - 100, centerY, 'blue', 2)); // 蓝色烟花放大
-            fireworks.push(new Firework(centerX + 100, centerY, 'red', 1.5));
+            // 生成两组蓝色烟花
+            fireworks.push(new Firework(centerX - 100, centerY, 'blue')); // 左侧蓝色烟花
+            fireworks.push(new Firework(centerX + 100, centerY, 'blue')); // 右侧蓝色烟花
         }
 
         function update() {
@@ -190,7 +190,7 @@
         setInterval(() => {
             drawHeart();
             createFireworks();
-        }, 3000);
+        }, 5000);
     </script>
 </body>
 </html>
